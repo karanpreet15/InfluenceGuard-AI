@@ -47,6 +47,140 @@ col3.metric("Fake Accounts", fake_users)
 col4.metric("Avg Influence Score", f"{avg_score:.2f}")
 
 st.divider()
+# ---------------- AI INFLUENCER ANALYZER ----------------
+
+st.subheader("🤖 AI Influencer Analyzer")
+
+col_a, col_b = st.columns(2)
+
+with col_a:
+    followers = st.number_input(
+        "Followers",
+        min_value=1,
+        value=10000
+    )
+
+    likes = st.number_input(
+        "Average Likes",
+        min_value=0,
+        value=500
+    )
+
+    comments = st.number_input(
+        "Average Comments",
+        min_value=0,
+        value=50
+    )
+
+with col_b:
+    shares = st.number_input(
+        "Average Shares",
+        min_value=0,
+        value=20
+    )
+
+    verified = st.selectbox(
+        "Verified Account",
+        ["No", "Yes"]
+    )
+
+    platform_input = st.selectbox(
+        "Platform",
+        ["Instagram", "Facebook", "Twitter"]
+    )
+
+if st.button("🚀 Analyze Influencer"):
+
+    engagement_rate = (
+        (likes + comments + shares) / followers
+    ) * 100
+
+    like_ratio = likes / followers
+    comment_ratio = comments / followers
+    share_ratio = shares / followers
+
+    if platform_input == "Instagram":
+        platform_weight = 1.0
+    elif platform_input == "Twitter":
+        platform_weight = 0.9
+    else:
+        platform_weight = 0.8
+
+    engagement_score = engagement_rate * platform_weight
+
+    influence_score = min(
+        100,
+        round(
+            (engagement_rate * 5)
+            + (comment_ratio * 1000)
+            + (share_ratio * 1000)
+        )
+    )
+
+    if influence_score >= 80:
+        tier = "Elite"
+    elif influence_score >= 60:
+        tier = "Strong"
+    elif influence_score >= 40:
+        tier = "Average"
+    else:
+        tier = "Weak"
+
+    suspicious = False
+
+    if engagement_rate < 1:
+        suspicious = True
+
+    if like_ratio > 0.30:
+        suspicious = True
+
+    if comment_ratio < 0.001:
+        suspicious = True
+
+    prediction = (
+        "⚠️ Suspicious Influencer"
+        if suspicious
+        else
+        "✅ Likely Authentic Influencer"
+    )
+
+    st.success(prediction)
+
+    m1, m2, m3, m4 = st.columns(4)
+
+    m1.metric(
+        "Influence Score",
+        influence_score
+    )
+
+    m2.metric(
+        "Tier",
+        tier
+    )
+
+    m3.metric(
+        "Engagement Rate",
+        f"{engagement_rate:.2f}%"
+    )
+
+    m4.metric(
+        "Engagement Score",
+        f"{engagement_score:.2f}"
+    )
+
+    st.info(
+        f"""
+        Platform: {platform_input}
+
+        Like Ratio: {like_ratio:.4f}
+
+        Comment Ratio: {comment_ratio:.4f}
+
+        Share Ratio: {share_ratio:.4f}
+        """
+    )
+
+st.divider()
 
 # ---------------- SIDEBAR FILTER ----------------
 st.sidebar.title("🔍 Filters")
